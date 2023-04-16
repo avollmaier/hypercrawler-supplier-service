@@ -1,6 +1,5 @@
 package at.hypercrawler.supplierservice.web.controller;
 
-import at.hypercrawler.supplierservice.domain.model.CrawlerStatus;
 import at.hypercrawler.supplierservice.domain.service.CrawlerService;
 import at.hypercrawler.supplierservice.web.dto.CrawlerRequest;
 import at.hypercrawler.supplierservice.web.dto.CrawlerResponse;
@@ -23,7 +22,8 @@ public class CrawlerController {
 
     private final CrawlerResponseMapper crawlerResponseMapper;
 
-    public CrawlerController(CrawlerService crawlerService, CrawlerRequestMapper crawlerRequestMapper, CrawlerResponseMapper crawlerResponseMapper) {
+    public CrawlerController(CrawlerService crawlerService, CrawlerRequestMapper crawlerRequestMapper,
+                             CrawlerResponseMapper crawlerResponseMapper) {
         this.crawlerService = crawlerService;
         this.crawlerRequestMapper = crawlerRequestMapper;
         this.crawlerResponseMapper = crawlerResponseMapper;
@@ -56,15 +56,10 @@ public class CrawlerController {
         return crawlerService.deleteCrawler(uuid);
     }
 
-    @PostMapping(value = "{uuid}/run")
-    Mono<CrawlerResponse> run(@PathVariable UUID uuid) {
-        log.info("Updating the crawler status with uuid {} to {}", uuid, CrawlerStatus.RUNNING);
-        return crawlerService.updateCrawler(uuid,CrawlerStatus.RUNNING).map(crawlerResponseMapper);
+    @PutMapping(value = "{uuid}")
+    Mono<CrawlerResponse> update(@PathVariable UUID uuid, @Valid @RequestBody CrawlerRequest crawlerRequest) {
+        log.info("Updating the crawler with uuid {}", uuid);
+        return crawlerService.updateCrawler(uuid, crawlerRequest.name(), crawlerRequest.config()).map(crawlerResponseMapper);
     }
 
-    @PostMapping(value = "{uuid}/pause")
-    Mono<CrawlerResponse> pause(@PathVariable UUID uuid) {
-        log.info("Updating the crawler status with uuid {} to {}", uuid, CrawlerStatus.STOPPED);
-        return crawlerService.updateCrawler(uuid,CrawlerStatus.STOPPED).map(crawlerResponseMapper);
-    }
 }

@@ -1,9 +1,12 @@
 package at.hypercrawler.supplierservice.domain.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.UUID;
 
-public class CrawlerNotFoundException extends RuntimeException {
+public class CrawlerNotFoundException extends ResponseStatusException {
     public CrawlerNotFoundException(UUID uuid) {
-        super("Crawler with id " + uuid + " not found");
+        super(HttpStatus.NOT_FOUND, "Crawler with id " + uuid + " not found");
     }
 }

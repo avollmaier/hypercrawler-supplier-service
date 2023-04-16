@@ -4,7 +4,7 @@ This is the edge-service for the hypercrawler project!🚀 It provides an entryp
 
 ## Useful Commands
 
-| Gradle Command	         | Description                                   |
+| Gradle Command	            | Description                                   |
 |:---------------------------|:----------------------------------------------|
 | `./gradlew bootRun`        | Run the application.                          |
 | `./gradlew build`          | Build the application.                        |

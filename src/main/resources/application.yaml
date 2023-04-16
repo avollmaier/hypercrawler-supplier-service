@@ -7,6 +7,10 @@ server:
     threads:
       max: 50
       min-spare: 5
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: always
 
 spring:
   application:

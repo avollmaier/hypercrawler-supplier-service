@@ -1,7 +1,5 @@
 package at.hypercrawler.supplierservice.domain.model;
 
-import lombok.Builder;
-import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -12,18 +10,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Document(value = "crawler")
-public record Crawler (
-    @Id
-     UUID id,
-     String name,
-     CrawlerStatus status,
-    @CreatedDate
-     Instant createdAt,
-    @LastModifiedDate
-     Instant updatedAt
+public record Crawler(@Id UUID id, String name, CrawlerStatus status, CrawlerConfig config,
+                      @CreatedDate Instant createdAt, @LastModifiedDate Instant updatedAt, @Version int version
 
-){
-     public Crawler(String testCrawler, CrawlerStatus crawlerStatus) {
-            this(UUID.randomUUID(), testCrawler, crawlerStatus, Instant.now(), Instant.now());
-     }
+) {
+    public Crawler(String name, CrawlerStatus crawlerStatus, CrawlerConfig config) {
+        this(UUID.randomUUID(), name, crawlerStatus, config, Instant.now(), Instant.now(), 0);
+    }
 }
