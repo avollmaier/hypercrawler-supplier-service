@@ -23,8 +23,8 @@ public class CrawlerRequestValiationTest {
 
     Supplier<List<String>> startUrls = () -> Arrays.asList("https://www.google.com", "https://www.bing.com");
     Supplier<List<SupportedFileType>> fileTypesToMatch = () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF);
-    Supplier<List<String>> pathsToMatch = () -> Arrays.asList("/path/to/file.html", "/test2/**");
-    Supplier<List<String>> selectorsToMatch = () -> Arrays.asList("selector1", "selector2");
+    Supplier<List<String>> pathsToMatch = () -> Arrays.asList("http://www.foufos.gr/", "http://www.foufos");
+    Supplier<List<String>> selectorsToMatch = () -> Arrays.asList(".products", "!.featured");
     Supplier<CrawlerConfig> crawlerConfig = () -> new CrawlerConfig(startUrls.get(), fileTypesToMatch.get(), pathsToMatch.get(), selectorsToMatch.get());
     Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
 
