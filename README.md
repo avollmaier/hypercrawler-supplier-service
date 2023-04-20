@@ -1,6 +1,6 @@
-# Supplier Service
+# Manager Service
 
-This is the edge-service for the hypercrawler project!🚀 It provides an entrypoint for the hypercrawler project.
+This is the manager-service for the hypercrawler project!🚀 It provides an entrypoint for the hypercrawler project.
 
 ## Useful Commands
 
@@ -15,5 +15,5 @@ This is the edge-service for the hypercrawler project!🚀 It provides an entryp
 After building the application, you can also run it from the Java CLI:
 
 ```bash
-java -jar build/libs/supplier-service-0.0.1-SNAPSHOT.jar
+java -jar build/libs/manager-service-0.0.1-SNAPSHOT.jar
 ```

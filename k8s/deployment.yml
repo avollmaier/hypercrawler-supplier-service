@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: supplier-service
+  name: manager-service
   labels:
-    app: supplier-service
+    app: manager-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: supplier-service
+      app: manager-service
   template:
     metadata:
       labels:
-        app: supplier-service
+        app: manager-service
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/path: /actuator/prometheus
         prometheus.io/port: "9003"
     spec:
       containers:
-        - name: supplier-service
-          image: supplier-service
+        - name: manager-service
+          image: manager-service
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:

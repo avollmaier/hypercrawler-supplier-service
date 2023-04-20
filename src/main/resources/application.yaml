@@ -14,7 +14,7 @@ server:
 
 spring:
   application:
-    name: supplier-service
+    name: manager-service
   lifecycle:
     timeout-per-shutdown-phase: 15s
   config:

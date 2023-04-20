@@ -1,10 +1,10 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "supplier-service"
-  description: "This is the supplier-service for the hypercrawler project!🚀"
+  name: "manager-service"
+  description: "This is the manager-service for the hypercrawler project!🚀"
   annotations:
-    github.com/project-slug: avollmaier/hypercrawler-supplier-service
+    github.com/project-slug: avollmaier/hypercrawler-manager-service
     backstage.io/techdocs-ref: dir:.
 spec:
   type: service
