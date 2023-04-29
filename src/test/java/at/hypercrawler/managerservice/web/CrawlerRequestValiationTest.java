@@ -23,11 +23,10 @@ public class CrawlerRequestValiationTest {
 
     Supplier<List<String>> startUrls = () -> Arrays.asList("https://www.google.com", "https://www.bing.com");
     Supplier<List<SupportedFileType>> fileTypesToMatch = () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF);
-    Supplier<List<String>> pathsToMatch = () -> Arrays.asList("http://www.foufos.gr/", "http://www.foufos");
+    Supplier<List<String>> pathsToMatch = () -> List.of("http://www.foufos.gr/**");
     Supplier<List<String>> selectorsToMatch = () -> Arrays.asList(".products", "!.featured");
     Supplier<CrawlerConfig> crawlerConfig = () -> new CrawlerConfig(startUrls.get(), fileTypesToMatch.get(), pathsToMatch.get(), selectorsToMatch.get());
     Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
-
     @BeforeAll
     public static void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();

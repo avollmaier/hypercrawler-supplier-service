@@ -34,16 +34,18 @@ class CrawlerServiceApplicationTest {
     private static final MongoDBContainer mongoContainer = new MongoDBContainer(DockerImageName.parse("mongo:latest"));
     Supplier<List<String>> startUrls = () -> Arrays.asList("https://www.google.com", "https://www.bing.com");
     Supplier<List<SupportedFileType>> fileTypesToMatch = () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF);
-    Supplier<List<String>> pathsToMatch = () -> Arrays.asList("http://www.foufos.gr/**", "http://www.foufos");
+    Supplier<List<String>> pathsToMatch = () -> List.of("http://www.foufos.gr/**");
     Supplier<List<String>> selectorsToMatch = () -> Arrays.asList(".products", "!.featured");
     Supplier<CrawlerConfig> crawlerConfig = () -> new CrawlerConfig(startUrls.get(), fileTypesToMatch.get(), pathsToMatch.get(), selectorsToMatch.get());
     Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
+
     Supplier<List<String>> updatedStartUrls = () -> List.of("https://www.bing.com");
     Supplier<List<SupportedFileType>> updatedFileTypesToMatch = () -> List.of(SupportedFileType.HTML);
-    Supplier<List<String>> updatedPathsToMatch = () -> List.of("http://www.foufos.gr/**");
-    Supplier<List<String>> updatedSelectorsToMatch = () -> Arrays.asList(".products", "!.featured");
+    Supplier<List<String>> updatedPathsToMatch = () -> Arrays.asList("http://www.foufos.gr/**", "http://www.foufos.co/**");
+    Supplier<List<String>> updatedSelectorsToMatch = () -> Arrays.asList(".products", "!.featured", ".featured");
     Supplier<CrawlerConfig> updatedCrawlerConfig = () -> new CrawlerConfig(updatedStartUrls.get(), updatedFileTypesToMatch.get(), updatedPathsToMatch.get(), updatedSelectorsToMatch.get());
     Supplier<CrawlerRequest> updatedCrawlerRequest = () -> new CrawlerRequest("Updated Crawler", updatedCrawlerConfig.get());
+
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -104,7 +106,7 @@ class CrawlerServiceApplicationTest {
     }
 
     @Test
-    void whenUpdateCrawlerStatusRequest_thenCrawlerStatusIsUpdated() throws JsonProcessingException {
+    void whenUpdateCrawlerRequest_thenCrawlerIsUpdated() throws JsonProcessingException {
 
         webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
 
@@ -122,7 +124,7 @@ class CrawlerServiceApplicationTest {
     }
 
     @Test
-    void whenUpdateCrawlerStatusRequestWithInvalidId_thenNotFound() throws JsonProcessingException {
+    void whenUpdateCrawlerRequestWithInvalidId_thenNotFound() throws JsonProcessingException {
         webTestClient.put().uri("/crawlers/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(updatedCrawlerRequest.get())).exchange().expectStatus().isNotFound();
     }
 
