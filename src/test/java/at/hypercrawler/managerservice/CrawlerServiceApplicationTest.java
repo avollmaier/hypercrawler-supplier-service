@@ -3,13 +3,18 @@ package at.hypercrawler.managerservice;
 import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
 import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
 import at.hypercrawler.managerservice.domain.model.SupportedFileType;
+import at.hypercrawler.managerservice.event.AddressSupplyMessage;
 import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
 import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.binder.test.OutputDestination;
+import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -19,14 +24,18 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ImportAutoConfiguration(TestChannelBinderConfiguration.class)
 @Testcontainers
 class CrawlerServiceApplicationTest {
 
@@ -48,8 +57,12 @@ class CrawlerServiceApplicationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
     @Autowired
     private WebTestClient webTestClient;
+
+    @Autowired
+    private OutputDestination output;
 
     @DynamicPropertySource
     static void mongoDbProperties(DynamicPropertyRegistry registry) {
@@ -67,9 +80,8 @@ class CrawlerServiceApplicationTest {
 
     @Test
     void whenGetAllCrawlersRequest_thenAllCrawlersAreReturned() throws JsonProcessingException {
-        var crawlerResponse1 = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
-
-        var crawlerResponse2 = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
+        webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult();
+        webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult();
 
         webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk().expectBodyList(CrawlerResponse.class);
     }
@@ -77,6 +89,7 @@ class CrawlerServiceApplicationTest {
     @Test
     void whenGetCrawlerRequest_thenCrawlerIsReturned() throws JsonProcessingException {
         var crawlerResponse = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
+        assertNotNull(crawlerResponse);
 
         webTestClient.get().uri("/crawlers/" + crawlerResponse.id()).exchange().expectStatus().isOk().expectBody(CrawlerResponse.class).value(crawlerResponse1 -> {
             assertThat(crawlerResponse1.id()).isEqualTo(crawlerResponse.id());
@@ -95,21 +108,21 @@ class CrawlerServiceApplicationTest {
         var crawlerResponse = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
 
-        webTestClient.delete().uri("/crawlers/" + crawlerResponse.id()).exchange().expectStatus().isNoContent();
+        assertNotNull(crawlerResponse);
 
+        webTestClient.delete().uri("/crawlers/" + crawlerResponse.id()).exchange().expectStatus().isNoContent();
         webTestClient.get().uri("/crawlers/" + crawlerResponse.id()).exchange().expectStatus().isNotFound();
     }
 
     @Test
-    void whenDeleteCrawlerRequestWithInvalidId_thenNotFound() throws JsonProcessingException {
+    void whenDeleteCrawlerRequestWithInvalidId_thenNotFound() {
         webTestClient.delete().uri("/crawlers/" + UUID.randomUUID()).exchange().expectStatus().isNoContent();
     }
 
     @Test
     void whenUpdateCrawlerRequest_thenCrawlerIsUpdated() throws JsonProcessingException {
 
-        webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
-
+        webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult();
         var crawlerResponse = webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk().expectBodyList(CrawlerResponse.class).returnResult().getResponseBody().get(0);
 
         webTestClient.put().uri("/crawlers/" + crawlerResponse.id()).contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(updatedCrawlerRequest.get())).exchange().expectStatus().isOk().expectBody(CrawlerResponse.class).value(c -> {
@@ -121,6 +134,45 @@ class CrawlerServiceApplicationTest {
             assertThat(c.createdAt()).isEqualTo(crawlerResponse.createdAt());
             assertThat(c.updatedAt()).isAfter(crawlerResponse.updatedAt());
         });
+    }
+
+    @Test
+    void whenStartCrawlerRequest_thenCrawlerIsStarted() throws IOException {
+        webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult();
+
+        var crawlerResponse = webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk().expectBodyList(CrawlerResponse.class).returnResult().getResponseBody().get(0);
+
+        webTestClient.put().uri("/crawlers/" + crawlerResponse.id() + "/start").exchange().expectStatus().isOk().expectBody(CrawlerResponse.class).value(c -> {
+            assertThat(c.id()).isEqualTo(crawlerResponse.id());
+            assertThat(c.name()).isEqualTo(crawlerResponse.name());
+            assertThat(c.status()).isEqualTo(CrawlerStatus.RUNNING);
+            assertThat(c.config().startUrls()).isEqualTo(crawlerResponse.config().startUrls());
+            assertThat(c.config().fileTypesToMatch()).isEqualTo(crawlerResponse.config().fileTypesToMatch());
+            assertThat(c.createdAt()).isEqualTo(crawlerResponse.createdAt());
+            assertThat(c.updatedAt()).isAfter(crawlerResponse.updatedAt());
+        });
+
+        assertThat(objectMapper.readValue(output.receive().getPayload(), AddressSupplyMessage.class))
+                .isEqualTo(new AddressSupplyMessage(crawlerResponse.id(), crawlerResponse.config().startUrls().get(0)));
+    }
+
+    @Test
+    void whenStopCrawlerRequest_thenCrawlerisStopped() throws IOException {
+        webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON).bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus().isCreated().expectBody(CrawlerResponse.class).returnResult();
+
+        var crawlerResponse = webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk().expectBodyList(CrawlerResponse.class).returnResult().getResponseBody().get(0);
+
+        webTestClient.put().uri("/crawlers/" + crawlerResponse.id() + "/stop").exchange().expectStatus().isOk().expectBody(CrawlerResponse.class).value(c -> {
+            assertThat(c.id()).isEqualTo(crawlerResponse.id());
+            assertThat(c.name()).isEqualTo(crawlerResponse.name());
+            assertThat(c.status()).isEqualTo(CrawlerStatus.STOPPED);
+            assertThat(c.config().startUrls()).isEqualTo(crawlerResponse.config().startUrls());
+            assertThat(c.config().fileTypesToMatch()).isEqualTo(crawlerResponse.config().fileTypesToMatch());
+            assertThat(c.createdAt()).isEqualTo(crawlerResponse.createdAt());
+            assertThat(c.updatedAt()).isAfter(crawlerResponse.updatedAt());
+        });
+
+        assertNull(output.receive());
     }
 
     @Test

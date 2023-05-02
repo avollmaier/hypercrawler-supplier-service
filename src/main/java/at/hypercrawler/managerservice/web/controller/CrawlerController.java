@@ -62,4 +62,16 @@ public class CrawlerController {
         return crawlerService.updateCrawler(uuid, crawlerRequest.name(), crawlerRequest.config()).map(crawlerResponseMapper);
     }
 
+    @PutMapping(value = "{uuid}/start")
+    Mono<CrawlerResponse> start(@PathVariable UUID uuid) {
+        log.info("Starting the crawler with uuid {}", uuid);
+        return crawlerService.startCrawler(uuid).map(crawlerResponseMapper);
+    }
+
+    @PutMapping(value = "{uuid}/stop")
+    Mono<CrawlerResponse> stop(@PathVariable UUID uuid) {
+        log.info("Stopping the crawler with uuid {}", uuid);
+        return crawlerService.stopCrawler(uuid).map(crawlerResponseMapper);
+    }
+
 }

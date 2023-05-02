@@ -29,6 +29,10 @@ spring:
         max-interval: 10000
         initial-interval: 3000
         multiplier: 1.3
+    stream:
+      bindings:
+        supplyAddress-out-0:
+          destination: address-supplied
   data:
     mongodb:
       username: admin
@@ -36,6 +40,12 @@ spring:
       password: admin
       port: 27017
       host: hypercrawler-mongo
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+    connection-timeout: 5s
 logging:
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
