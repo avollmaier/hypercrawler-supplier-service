@@ -41,7 +41,7 @@ spring:
       port: 27017
       host: hypercrawler-mongo
   rabbitmq:
-    host: localhost
+    host: hypercrawler-rabbitmq
     port: 5672
     username: admin
     password: admin

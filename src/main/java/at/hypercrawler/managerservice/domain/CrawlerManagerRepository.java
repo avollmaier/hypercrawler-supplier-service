@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface CrawlerRepository
+public interface CrawlerManagerRepository
         extends ReactiveMongoRepository<Crawler, UUID> {
 }

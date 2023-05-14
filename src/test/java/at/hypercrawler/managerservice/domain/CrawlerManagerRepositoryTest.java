@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 @DataMongoTest
 @Testcontainers
-class CrawlerRepositoryTest {
+class CrawlerManagerRepositoryTest {
     @Container
     private static final MongoDBContainer mongoContainer =
             new MongoDBContainer(DockerImageName.parse("mongo:latest"));
@@ -36,7 +36,7 @@ class CrawlerRepositoryTest {
 
 
     @Autowired
-    private CrawlerRepository crawlerRepository;
+    private CrawlerManagerRepository crawlerManagerRepository;
 
     @DynamicPropertySource
     static void mongoDbProperties(DynamicPropertyRegistry registry) {
@@ -45,13 +45,13 @@ class CrawlerRepositoryTest {
 
     @Test
     void findCrawlerByIdWhenNotExisting() {
-        StepVerifier.create(crawlerRepository.findById(UUID.randomUUID())).expectNextCount(0).verifyComplete();
+        StepVerifier.create(crawlerManagerRepository.findById(UUID.randomUUID())).expectNextCount(0).verifyComplete();
     }
 
     @Test
     void createCrawler() {
         var createdCrawler = new Crawler("Test Crawler", CrawlerStatus.CREATED, crawlerConfig.get());
-        StepVerifier.create(crawlerRepository.save(createdCrawler))
+        StepVerifier.create(crawlerManagerRepository.save(createdCrawler))
                 .expectNextMatches(c -> c.status().equals(CrawlerStatus.CREATED) && c.name().equals("Test Crawler") && c.config().equals(crawlerConfig.get()))
                 .verifyComplete();
     }

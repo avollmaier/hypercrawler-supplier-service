@@ -3,7 +3,7 @@ package at.hypercrawler.managerservice;
 import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
 import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
 import at.hypercrawler.managerservice.domain.model.SupportedFileType;
-import at.hypercrawler.managerservice.event.AddressSupplyMessage;
+import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
 import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
 import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,7 +14,6 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -25,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -152,8 +152,8 @@ class CrawlerServiceApplicationTest {
             assertThat(c.updatedAt()).isAfter(crawlerResponse.updatedAt());
         });
 
-        assertThat(objectMapper.readValue(output.receive().getPayload(), AddressSupplyMessage.class))
-                .isEqualTo(new AddressSupplyMessage(crawlerResponse.id(), crawlerResponse.config().startUrls().get(0)));
+        assertThat(objectMapper.readValue(output.receive().getPayload(), AddressSuppliedMessage.class))
+                .isEqualTo(new AddressSuppliedMessage(crawlerResponse.id(), new URL(crawlerResponse.config().startUrls().get(0))));
     }
 
     @Test
