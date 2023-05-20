@@ -1,5 +1,6 @@
 package at.hypercrawler.managerservice.web.controller;
 
+import at.hypercrawler.managerservice.domain.model.SupportedFileType;
 import at.hypercrawler.managerservice.domain.service.CrawlerManagerService;
 import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
 import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j

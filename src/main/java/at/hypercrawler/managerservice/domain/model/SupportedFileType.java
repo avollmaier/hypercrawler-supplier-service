@@ -1,7 +1,7 @@
 package at.hypercrawler.managerservice.domain.model;
 
 public enum SupportedFileType {
-    HTML("html"), PDF("pdf"), DOC("doc"), DOCX("docx"), XLS("xls"), XLSX("xlsx"), PPT("ppt"), PPTX("pptx"), TXT("txt");
+    HTML("html"), PDF("pdf"), TXT("txt");
 
     private final String format;
 

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 import java.util.function.Function;
@@ -69,6 +70,7 @@ public class CrawlerManagerService {
 
     private Mono<Crawler> updateCrawlerStatus(UUID uuid, CrawlerStatus status) {
         Function<Crawler, Crawler> applyStatus = c -> new Crawler(c.id(), c.name(), status, c.config(), c.createdAt(), c.updatedAt(), c.version());
+
         return crawlerManagerRepository.findById(uuid)
                 .map(applyStatus)
                 .flatMap(crawlerManagerRepository::save)
@@ -91,8 +93,8 @@ public class CrawlerManagerService {
                 var result = streamBridge.send("supplyAddress-out-0", addressSupplyMessage);
                 log.info("Result of sending address {} for crawler with id: {} is {}", address, id, result);
 
-            } catch (Exception e) {
-                log.warn("Address {} is not a valid URL", address);
+            } catch (MalformedURLException e) {
+                log.warn("Error while parsing Address: {} - error: {}", address, e.getMessage());
             }
         }
     }
