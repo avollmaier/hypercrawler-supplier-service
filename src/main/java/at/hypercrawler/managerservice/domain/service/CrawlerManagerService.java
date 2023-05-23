@@ -1,23 +1,21 @@
 package at.hypercrawler.managerservice.domain.service;
 
+import java.util.UUID;
+import java.util.function.UnaryOperator;
+
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import at.hypercrawler.managerservice.domain.CrawlerManagerRepository;
 import at.hypercrawler.managerservice.domain.exception.CrawlerAlreadyExistsException;
 import at.hypercrawler.managerservice.domain.exception.CrawlerNotFoundException;
 import at.hypercrawler.managerservice.domain.model.Crawler;
-import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
-import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
-import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
+import at.hypercrawler.managerservice.web.dto.CrawlerConfig;
+import at.hypercrawler.managerservice.web.dto.CrawlerStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.UUID;
-import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -40,16 +38,16 @@ public class CrawlerManagerService {
     }
 
     public Mono<Crawler> createCrawler(Crawler crawler) {
-        return crawlerManagerRepository.existsById(crawler.id()).flatMap(exists -> {
-            if (Boolean.TRUE.equals(exists)) {
-                return Mono.error(new CrawlerAlreadyExistsException(crawler.id()));
-            }
-            return crawlerManagerRepository.save(crawler);
-        });
+      return crawlerManagerRepository.existsById(crawler.getId()).flatMap(exists -> {
+        if (Boolean.TRUE.equals(exists)) {
+          return Mono.error(new CrawlerAlreadyExistsException(crawler.getId()));
+        }
+        return crawlerManagerRepository.save(crawler);
+      });
     }
 
     public Mono<Crawler> startCrawler(UUID uuid) {
-        return updateCrawlerStatus(uuid, CrawlerStatus.RUNNING);
+      return updateCrawlerStatus(uuid, CrawlerStatus.STARTED);
     }
 
     public Mono<Crawler> stopCrawler(UUID uuid) {
@@ -61,31 +59,31 @@ public class CrawlerManagerService {
     }
 
     public Mono<Crawler> updateCrawler(UUID uuid, String name, CrawlerConfig config) {
-        Function<Crawler, Crawler> updateCrawler = c -> new Crawler(c.id(), name, c.status(), config, c.createdAt(), c.updatedAt(), c.version());
-        return crawlerManagerRepository.findById(uuid)
-                .map(updateCrawler)
-                .flatMap(crawlerManagerRepository::save)
-                .switchIfEmpty(Mono.error(new CrawlerNotFoundException(uuid)));
+      UnaryOperator<Crawler> updateCrawler =
+        c -> new Crawler(c.getId(), name, config, c.getStatus(), c.getCreatedAt(), c.getUpdatedAt(),
+          c.getVersion());
+      return crawlerManagerRepository.findById(uuid).map(updateCrawler)
+        .flatMap(crawlerManagerRepository::save)
+        .switchIfEmpty(Mono.error(new CrawlerNotFoundException(uuid)));
     }
 
     private Mono<Crawler> updateCrawlerStatus(UUID uuid, CrawlerStatus status) {
-        Function<Crawler, Crawler> applyStatus = c -> new Crawler(c.id(), c.name(), status, c.config(), c.createdAt(), c.updatedAt(), c.version());
+      UnaryOperator<Crawler> applyStatus =
+        c -> new Crawler(c.getId(), c.getName(), c.getConfig(), status, c.getCreatedAt(), c.getUpdatedAt(),
+          c.getVersion());
 
-        return crawlerManagerRepository.findById(uuid)
-                .map(applyStatus)
-                .flatMap(crawlerManagerRepository::save)
-                .switchIfEmpty(Mono.error(new CrawlerNotFoundException(uuid)))
-                .doOnNext(crawler -> {
-                    if (status == CrawlerStatus.RUNNING) {
-                        publishAddressSupplyEvent(crawler);
-                    }
-                });
+      return crawlerManagerRepository.findById(uuid).map(applyStatus).flatMap(crawlerManagerRepository::save)
+        .switchIfEmpty(Mono.error(new CrawlerNotFoundException(uuid))).doOnNext(crawler -> {
+          if (status == CrawlerStatus.STARTED) {
+            publishAddressSupplyEvent(crawler);
+          }
+        });
     }
 
-    private void publishAddressSupplyEvent(Crawler crawler) {
-        UUID id = crawler.id();
-
-        for (String address : crawler.config().startUrls()) {
+  private void publishAddressSupplyEvent(Crawler crawler) {
+    UUID id = crawler.getId();
+/*
+        for (String address : crawler.getConfig().) {
             try {
                 var addressSupplyMessage = new AddressSuppliedMessage(id, new URL(address));
                 log.info("Sending data with address {} of crawler with id: {}", address, id);
@@ -98,4 +96,6 @@ public class CrawlerManagerService {
             }
         }
     }
+ */
+  }
 }

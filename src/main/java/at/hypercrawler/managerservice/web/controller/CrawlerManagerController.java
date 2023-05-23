@@ -1,27 +1,33 @@
 package at.hypercrawler.managerservice.web.controller;
 
-import at.hypercrawler.managerservice.domain.model.SupportedFileType;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import at.hypercrawler.managerservice.domain.service.CrawlerManagerService;
 import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
 import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @RestController
 @RequestMapping("crawlers")
 public class CrawlerManagerController {
+
     private final CrawlerManagerService crawlerManagerService;
-
     private final CrawlerRequestMapper crawlerRequestMapper;
-
     private final CrawlerResponseMapper crawlerResponseMapper;
 
     public CrawlerManagerController(CrawlerManagerService crawlerManagerService, CrawlerRequestMapper crawlerRequestMapper,
@@ -46,7 +52,7 @@ public class CrawlerManagerController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     Mono<CrawlerResponse> create(@Valid @RequestBody CrawlerRequest crawlerRequest) {
-        log.info("Creating a new crawler with name {}", crawlerRequest.name());
+        log.info("Creating a new crawler with name {}", crawlerRequest.getName());
         var crawler = crawlerRequestMapper.apply(crawlerRequest);
         return crawlerManagerService.createCrawler(crawler).map(crawlerResponseMapper);
     }
@@ -61,16 +67,17 @@ public class CrawlerManagerController {
     @PutMapping(value = "{uuid}")
     Mono<CrawlerResponse> update(@PathVariable UUID uuid, @Valid @RequestBody CrawlerRequest crawlerRequest) {
         log.info("Updating the crawler with uuid {}", uuid);
-        return crawlerManagerService.updateCrawler(uuid, crawlerRequest.name(), crawlerRequest.config()).map(crawlerResponseMapper);
+        return crawlerManagerService.updateCrawler(uuid, crawlerRequest.getName(), crawlerRequest.getConfig())
+          .map(crawlerResponseMapper);
     }
 
-    @PutMapping(value = "{uuid}/start")
+    @PutMapping(value = "{uuid}/run")
     Mono<CrawlerResponse> start(@PathVariable UUID uuid) {
         log.info("Starting the crawler with uuid {}", uuid);
         return crawlerManagerService.startCrawler(uuid).map(crawlerResponseMapper);
     }
 
-    @PutMapping(value = "{uuid}/stop")
+    @PutMapping(value = "{uuid}/pause")
     Mono<CrawlerResponse> stop(@PathVariable UUID uuid) {
         log.info("Stopping the crawler with uuid {}", uuid);
         return crawlerManagerService.stopCrawler(uuid).map(crawlerResponseMapper);

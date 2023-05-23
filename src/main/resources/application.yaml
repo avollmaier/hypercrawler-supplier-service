@@ -83,3 +83,6 @@ eureka:
     lease-expiration-duration-in-seconds: 3
     lease-renewal-interval-in-seconds: 1
     instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${random.value}
+
+springdoc:
+  show-actuator: true
