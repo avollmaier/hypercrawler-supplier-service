@@ -1,15 +1,18 @@
 package at.hypercrawler.managerservice;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -86,8 +89,7 @@ class CrawlerServiceApplicationTest {
       .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
       .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
       .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-      .startSitemaps(Collections.singletonList("https://www.google.com/sitemap.xml")).build();
+      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**")).build();
   Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
   Supplier<CrawlerRobotOptions> updatedRobotOptions =
     () -> CrawlerRobotOptions.builder().ignoreRobotNoFollowTo(false).ignoreRobotRules(true)
@@ -97,8 +99,7 @@ class CrawlerServiceApplicationTest {
       .indexPrefix("crawlerr_").requestOptions(updatedCrawlerRequestOptions.get())
       .startUrls(updatedStartUrls.get()).schedule("0 0 2 1 1 ? 2099").robotOptions(updatedRobotOptions.get())
       .queryParameterExclusionPatterns(Collections.singletonList("utc_*"))
-      .siteExclusionPatterns(Collections.singletonList("https://www.yahoo.com/**"))
-      .startSitemaps(Collections.singletonList("https://www.google.com/sitemaps.xml")).build();
+      .siteExclusionPatterns(Collections.singletonList("https://www.yahoo.com/**")).build();
   Supplier<CrawlerRequest> updatedCrawlerRequest =
     () -> new CrawlerRequest("Updated Test Crawler", updatedCrawlerConfig.get());
   @Autowired
@@ -196,7 +197,7 @@ class CrawlerServiceApplicationTest {
     }
 
     @Test
-    void whenStartCrawlerRequest_thenCrawlerIsStarted() throws IOException {
+    void whenRunCrawlerRequest_thenCrawlerIsStarted() throws IOException {
       webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
         .bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus()
         .isCreated().expectBody(CrawlerResponse.class).returnResult();
@@ -208,19 +209,15 @@ class CrawlerServiceApplicationTest {
         .isOk().expectBody(CrawlerResponse.class).value(c -> {
           assertThat(c.getId()).isEqualTo(crawlerResponse.getId());
           assertThat(c.getName()).isEqualTo(crawlerResponse.getName());
-          assertThat(c.getStatus()).isEqualTo(crawlerResponse.getStatus());
+          assertThat(c.getStatus()).isEqualTo(CrawlerStatus.STARTED);
           assertThat(c.getConfig()).isEqualTo(crawlerResponse.getConfig());
           assertThat(c.getCreatedAt()).isEqualTo(crawlerResponse.getCreatedAt());
           assertThat(c.getUpdatedAt()).isAfter(crawlerResponse.getUpdatedAt());
         });
-
-      //TODO
-      // assertThat(objectMapper.readValue(output.receive().getPayload(), AddressSuppliedMessage.class))
-      // .isEqualTo(new AddressSuppliedMessage(crawlerResponse.getId(), new URL(crawlerResponse.getConfig().startUrls().get(0))));
     }
 
     @Test
-    void whenStopCrawlerRequest_thenCrawlerisStopped() throws IOException {
+    void whenStopCrawlerRequest_thenCrawlerIsStopped() throws IOException {
       webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
         .bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus()
         .isCreated().expectBody(CrawlerResponse.class).returnResult();
@@ -232,7 +229,7 @@ class CrawlerServiceApplicationTest {
         .isOk().expectBody(CrawlerResponse.class).value(c -> {
           assertThat(c.getId()).isEqualTo(crawlerResponse.getId());
           assertThat(c.getName()).isEqualTo(crawlerResponse.getName());
-          assertThat(c.getStatus()).isEqualTo(crawlerResponse.getStatus());
+          assertThat(c.getStatus()).isEqualTo(CrawlerStatus.STOPPED);
           assertThat(c.getConfig()).isEqualTo(crawlerResponse.getConfig());
           assertThat(c.getCreatedAt()).isEqualTo(crawlerResponse.getCreatedAt());
           assertThat(c.getUpdatedAt()).isAfter(crawlerResponse.getUpdatedAt());

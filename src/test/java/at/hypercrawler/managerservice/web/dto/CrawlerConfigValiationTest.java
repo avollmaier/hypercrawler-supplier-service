@@ -14,6 +14,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class CrawlerConfigValiationTest {
 
   private static Validator validator;
@@ -40,8 +42,7 @@ class CrawlerConfigValiationTest {
       .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
       .schedule(validCron.get()).robotOptions(robotOptions.get())
       .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-      .startSitemaps(Collections.singletonList("https://www.google.com/sitemap.xml"));
+      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"));
 
   @BeforeAll
   public static void setUp() {
@@ -72,7 +73,7 @@ class CrawlerConfigValiationTest {
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Request timeout must be greater than 0");
+      .containsExactly("Schedule is not valid");
   }
 
   @Test
@@ -110,34 +111,6 @@ class CrawlerConfigValiationTest {
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
       .containsExactly("Start-Url could not be empty");
-  }
-
-  //the same with what we did for startUrls now with startSitemaps
-  @Test
-  void whenStartSitemapsIsNullThenValidationFails() {
-    var crawlerConfig = crawlerConfigBuilder.get().startSitemaps(null).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isEmpty();
-  }
-
-  @Test
-  void whenAddedStartSitemapIsNullThenValidationFails() {
-    var startSitemaps = Arrays.asList("https://www.google.com", null);
-    var crawlerConfig = crawlerConfigBuilder.get().startSitemaps(startSitemaps).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Sitemap could not be empty");
-  }
-
-  @Test
-  void whenAddedStartSitemapIsEmptyThenValidationFails() {
-    var crawlerConfig = crawlerConfigBuilder.get().startSitemaps(Collections.singletonList("")).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Sitemap could not be empty");
   }
 
   @Test

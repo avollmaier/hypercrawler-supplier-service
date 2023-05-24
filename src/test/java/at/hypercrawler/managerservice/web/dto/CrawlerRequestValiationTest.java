@@ -14,6 +14,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class CrawlerRequestValiationTest {
 
   private static Validator validator;
@@ -39,7 +41,7 @@ public class CrawlerRequestValiationTest {
       .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
       .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
       .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-      .startSitemaps(Collections.singletonList("https://www.google.com/sitemap.xml")).build();
+            .build();
   Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
 
   @BeforeAll

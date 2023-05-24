@@ -52,8 +52,7 @@ class CrawlerManagerRepositoryTest {
         .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
         .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
         .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-        .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-        .startSitemaps(Collections.singletonList("https://www.google.com/sitemap.xml")).build();
+        .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**")).build();
 
     @Autowired
     private CrawlerManagerRepository crawlerManagerRepository;

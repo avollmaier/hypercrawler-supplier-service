@@ -47,8 +47,7 @@ class CrawlerResponseJsonTest {
       .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
       .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
       .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-      .startSitemaps(Collections.singletonList("https://www.google.com/sitemap.xml")).build();
+      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**")).build();
   Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
   @Autowired
   private JacksonTester<CrawlerResponse> json;
@@ -75,8 +74,6 @@ class CrawlerResponseJsonTest {
     assertThat(jsonContent).extractingJsonPathStringValue("@.config.startUrls[1]")
       .isEqualTo(crawler.getConfig().getStartUrls().get(1));
 
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.startSitemaps[0]")
-      .isEqualTo(crawler.getConfig().getStartSitemaps().get(0));
     assertThat(jsonContent).extractingJsonPathStringValue("@.config.siteExclusionPatterns[0]")
       .isEqualTo(crawler.getConfig().getSiteExclusionPatterns().get(0));
     assertThat(jsonContent).extractingJsonPathStringValue("@.config.queryParameterExclusionPatterns[0]")

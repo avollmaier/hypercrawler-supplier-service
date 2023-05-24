@@ -44,7 +44,7 @@ class CrawlerRequestJsonTest {
       .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
       .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
       .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-      .startSitemaps(Collections.singletonList("https://www.google.com/sitemap.xml")).build();
+            .build();
   Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
   @Autowired
   private JacksonTester<CrawlerRequest> json;
@@ -63,9 +63,6 @@ class CrawlerRequestJsonTest {
                           "startUrls":[
                              "https://www.google.com",
                              "https://www.bing.com"
-                          ],
-                          "startSitemaps":[
-                             "https://www.google.com/sitemap.xml"
                           ],
                           "siteExclusionPatterns":[
                              "https://www.google.com/**"
