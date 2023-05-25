@@ -2,6 +2,7 @@ package at.hypercrawler.managerservice.web.controller;
 
 import java.util.UUID;
 
+import at.hypercrawler.managerservice.web.dto.StatusResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,13 @@ public class CrawlerManagerController {
     Mono<CrawlerResponse> getByUuid(@PathVariable UUID uuid) {
         log.info("Fetching the crawler with uuid {}", uuid);
         return crawlerManagerService.findById(uuid).map(crawlerResponseMapper);
+    }
+
+    //get status by uuid
+    @GetMapping("{uuid}/status")
+    Mono<StatusResponse> getStatusByUuid(@PathVariable UUID uuid) {
+        log.info("Fetching the status of the crawler with uuid {}", uuid);
+        return crawlerManagerService.findById(uuid).map(crawlerResponseMapper).map(crawlerResponse -> new StatusResponse(crawlerResponse.getStatus()));
     }
 
     @PostMapping

@@ -5,14 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
+import at.hypercrawler.managerservice.web.dto.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -30,16 +29,6 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import at.hypercrawler.managerservice.web.dto.CrawlerAction;
-import at.hypercrawler.managerservice.web.dto.CrawlerConfig;
-import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
-import at.hypercrawler.managerservice.web.dto.CrawlerRequestOptions;
-import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
-import at.hypercrawler.managerservice.web.dto.CrawlerRobotOptions;
-import at.hypercrawler.managerservice.web.dto.CrawlerStatus;
-import at.hypercrawler.managerservice.web.dto.Header;
-import at.hypercrawler.managerservice.web.dto.SupportedFileType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ImportAutoConfiguration(TestChannelBinderConfiguration.class)
@@ -150,6 +139,20 @@ class CrawlerServiceApplicationTest {
           assertThat(crawlerResponse1.getStatus()).isEqualTo(crawlerResponse.getStatus());
         });
     }
+
+    @Test
+    void whenGetCrawlerStatusRequest_thenCrawlerStatusIsReturned() throws JsonProcessingException {
+        var crawlerResponse = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(crawlerRequest.get())).exchange().expectStatus()
+                .isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
+        assertNotNull(crawlerResponse);
+
+        webTestClient.get().uri("/crawlers/" + crawlerResponse.getId() + "/status").exchange().expectStatus().isOk()
+                .expectBody(StatusResponse.class).value(crawlerResponse1 -> {
+                    assertThat(crawlerResponse.getStatus()).isEqualTo(crawlerResponse.getStatus());
+                });
+    }
+
 
     @Test
     void whenGetCrawlerRequestWithInvalidId_thenNotFound() {
