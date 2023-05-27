@@ -75,14 +75,5 @@ management:
     tags:
       application: ${spring.application.name}
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${DISCOVERY_SERVICE_URL:http://localhost:9000/eureka/}
-  instance:
-    lease-expiration-duration-in-seconds: 3
-    lease-renewal-interval-in-seconds: 1
-    instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${random.value}
-
 springdoc:
   show-actuator: true
