@@ -72,12 +72,9 @@ class CrawlerMessageTest {
             () -> CrawlerRobotOptions.builder().ignoreRobotNoFollowTo(true).ignoreRobotRules(true)
                     .ignoreRobotNoIndex(true).build();
     Supplier<CrawlerConfig> crawlerConfig =
-            () -> CrawlerConfig.builder().actions(Collections.singletonList(crawlerAction.get()))
+            () -> CrawlerConfig.builder().action(crawlerAction.get())
                     .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
-                    .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
-                    .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-                    .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-                    .build();
+                    .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get()).build();
     Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
 
     @Autowired

@@ -20,15 +20,9 @@ public class CrawlerConfig {
   @NotNull(message = "Start-Urls could not be empty") List<@NotBlank(message = "Start-Url could not be empty") String>
     startUrls;
 
-  List<@NotBlank(message = "Exclusion-Pattern could not be empty") String> siteExclusionPatterns;
-
-  List<@NotBlank(message = "Ignored-Query-Parameter could not be empty") String>
-    queryParameterExclusionPatterns;
-
   @Valid CrawlerRequestOptions requestOptions;
 
   CrawlerRobotOptions robotOptions;
 
-  @NotNull(message = "Actions could not be empty") List<@NotNull(message = "Actions could not be empty") CrawlerAction>
-    actions;
+  @NotNull(message = "Action could not be empty") CrawlerAction action;
 }

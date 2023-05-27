@@ -38,11 +38,9 @@ class CrawlerConfigValiationTest {
   Supplier<String> validCron = () -> "0 0 12 * * ?";
   //supplier with prefilled builder
   Supplier<CrawlerConfig.CrawlerConfigBuilder> crawlerConfigBuilder =
-    () -> CrawlerConfig.builder().actions(Collections.singletonList(crawlerAction.get()))
+          () -> CrawlerConfig.builder().action(crawlerAction.get())
       .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
-      .schedule(validCron.get()).robotOptions(robotOptions.get())
-      .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"));
+      .schedule(validCron.get()).robotOptions(robotOptions.get());
 
   @BeforeAll
   public static void setUp() {
@@ -111,64 +109,6 @@ class CrawlerConfigValiationTest {
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
       .containsExactly("Start-Url could not be empty");
-  }
-
-  @Test
-  void whenSiteExclusionPatternsIsNullThenValidationFails() {
-    var crawlerConfig = crawlerConfigBuilder.get().siteExclusionPatterns(null).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isEmpty();
-  }
-
-  @Test
-  void whenAddedSiteExclusionPatternIsNullThenValidationFails() {
-    var siteExclusionPatterns = Arrays.asList("https://www.google.com", null);
-    var crawlerConfig = crawlerConfigBuilder.get().siteExclusionPatterns(siteExclusionPatterns).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Exclusion-Pattern could not be empty");
-  }
-
-  @Test
-  void whenAddedSiteExclusionPatternIsEmptyThenValidationFails() {
-    var siteExclusionPatterns = Arrays.asList("https://www.google.com", "");
-    var crawlerConfig = crawlerConfigBuilder.get().siteExclusionPatterns(siteExclusionPatterns).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Exclusion-Pattern could not be empty");
-  }
-
-  @Test
-  void whenQueryParameterExclusionPatternsIsNullThenValidationSucceeds() {
-    var crawlerConfig = crawlerConfigBuilder.get().queryParameterExclusionPatterns(null).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isEmpty();
-  }
-
-  @Test
-  void whenAddedQueryParameterExclusionPatternIsNullThenValidationFails() {
-    var queryParameterExclusionPatterns = Arrays.asList("utm_*", null);
-    var crawlerConfig =
-      crawlerConfigBuilder.get().queryParameterExclusionPatterns(queryParameterExclusionPatterns).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Ignored-Query-Parameter could not be empty");
-  }
-
-  @Test
-  void whenAddedQueryParameterExclusionPatternIsEmptyThenValidationFails() {
-    var queryParameterExclusionPatterns = Arrays.asList("utm_*", "");
-    var crawlerConfig =
-      crawlerConfigBuilder.get().queryParameterExclusionPatterns(queryParameterExclusionPatterns).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Ignored-Query-Parameter could not be empty");
   }
 
   @Test
@@ -256,21 +196,11 @@ class CrawlerConfigValiationTest {
 
   @Test
   void whenActionIsNullThenValidationFails() {
-    var crawlerConfig = crawlerConfigBuilder.get().actions(null).build();
+    var crawlerConfig = crawlerConfigBuilder.get().action(null).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Actions could not be empty");
-  }
-
-  @Test
-  void whenAddedActionIsNullThenValidationFails() {
-    var actions = Arrays.asList(crawlerAction.get(), null);
-    var crawlerConfig = crawlerConfigBuilder.get().actions(actions).build();
-    var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
-    assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
-      .containsExactly("Actions could not be empty");
+      .containsExactly("Action could not be empty");
   }
 
 }
