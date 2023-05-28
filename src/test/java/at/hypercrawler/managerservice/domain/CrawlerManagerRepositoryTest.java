@@ -31,12 +31,12 @@ class CrawlerManagerRepositoryTest {
     }
 
     @Test
-    void findCrawlerByIdWhenNotExisting() {
+    void whenfindCrawlerByIdWhenNotExisting_thenNoCrawlerReturned() {
         StepVerifier.create(crawlerManagerRepository.findById(UUID.randomUUID())).expectNextCount(0).verifyComplete();
     }
 
     @Test
-    void createCrawler() {
+    void whencreateCrawler_thenCrawlerIsInDatabase() {
 
         StepVerifier.create(crawlerManagerRepository.save(CrawlerTestDummyProvider.crawler.get())).expectNextMatches(
                 c -> c.status().equals(CrawlerStatus.CREATED) && c.name().equals("Test Crawler")

@@ -25,6 +25,8 @@ import java.util.function.UnaryOperator;
 @Service
 @Transactional
 public class CrawlerManagerService {
+    public static final String SUPPLY_ADDRESS_OUT = "supplyAddress-out-0";
+
     private final CrawlerManagerRepository crawlerManagerRepository;
     private final StreamBridge streamBridge;
 
@@ -91,7 +93,7 @@ public class CrawlerManagerService {
             var addressSupplyMessage = new AddressSuppliedMessage(id, address);
             log.info("Sending data with address {} of crawler with id: {}", address, id);
 
-            var result = streamBridge.send("supplyAddress-out-0", addressSupplyMessage);
+            var result = streamBridge.send(SUPPLY_ADDRESS_OUT, addressSupplyMessage);
             log.info("Result of sending address {} for crawler with id: {} is {}", address, id, result);
         });
     }

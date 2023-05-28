@@ -23,27 +23,28 @@ public class CrawlerRequestValiationTest {
   }
 
   @Test
-  void whenAllFieldsCorrectThenValidationSucceeds() {
+  void whenAllFieldsCorrect_thenValidationSucceeds() {
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(CrawlerTestDummyProvider.crawlerRequest.get());
     assertThat(violations).isEmpty();
   }
 
   @Test
-  void whenNameIsNullThenValidationFails() {
+  void whenNameIsNull_thenValidationFails() {
     var crawlerRequest = new CrawlerRequest(null, CrawlerTestDummyProvider.crawlerConfig.get());
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty();
   }
 
   @Test
-  void whenNameIsEmptyThenValidationFails() {
+  void whenNameIsEmpty_thenValidationFails() {
     var crawlerRequest = new CrawlerRequest("", CrawlerTestDummyProvider.crawlerConfig.get());
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty();
   }
 
   @Test
-  void whenConfigIsNullThenValidationFails() {
+  @SuppressWarnings("all")
+  void whenConfigIsNull_thenValidationFails() {
     var crawlerRequest = new CrawlerRequest("Test Crawler", null);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty();

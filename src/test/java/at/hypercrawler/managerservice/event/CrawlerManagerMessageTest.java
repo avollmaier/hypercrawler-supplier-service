@@ -1,6 +1,6 @@
-package at.hypercrawler.managerservice;
+package at.hypercrawler.managerservice.event;
 
-import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
+import at.hypercrawler.managerservice.CrawlerTestDummyProvider;
 import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,14 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ImportAutoConfiguration(TestChannelBinderConfiguration.class)
 @Testcontainers
-class CrawlerMessageTest {
+class CrawlerManagerMessageTest {
 
     @Container
     private static final MongoDBContainer mongoContainer =
@@ -53,8 +54,8 @@ class CrawlerMessageTest {
                 .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.crawlerRequest.get())).exchange().expectStatus()
                 .isCreated().expectBody(CrawlerResponse.class).returnResult();
 
-        var crawlerResponse = webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
-                .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody().get(0);
+        var crawlerResponse = Objects.requireNonNull(webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
+                .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody()).get(0);
 
         webTestClient.put().uri("/crawlers/" + crawlerResponse.id() + "/run").exchange().expectStatus().isOk();
 

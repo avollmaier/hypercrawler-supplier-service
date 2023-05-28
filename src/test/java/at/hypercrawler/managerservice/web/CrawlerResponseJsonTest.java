@@ -1,7 +1,7 @@
 package at.hypercrawler.managerservice.web;
 
-import at.hypercrawler.managerservice.domain.model.*;
-import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
+import at.hypercrawler.managerservice.CrawlerTestDummyProvider;
+import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
 import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,49 +9,21 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 class CrawlerResponseJsonTest {
 
-  Supplier<List<String>> startUrls = () -> Arrays.asList("https://www.google.com", "https://www.bing.com");
-  Supplier<List<SupportedFileType>> fileTypesToMatch =
-    () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF);
-  Supplier<List<String>> pathsToMatch = () -> List.of("http://www.foufos.gr/**");
-  Supplier<List<String>> selectorsToMatch = () -> Arrays.asList(".products", "!.featured");
-
-  public static Supplier<CrawlerFilterOptions> crawlerFilterOptions =
-          () -> CrawlerFilterOptions.builder().queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-                  .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**")).build();
-  Supplier<CrawlerAction> crawlerAction =
-          () -> CrawlerAction.builder().fileTypesToMatch(fileTypesToMatch.get()).pathsToMatch(pathsToMatch.get())
-                  .selectorsToMatch(selectorsToMatch.get()).indexName("test_index").build();
-  Supplier<CrawlerRequestOptions> crawlerRequestOptions =
-          () -> CrawlerRequestOptions.builder().requestTimeout(1000).proxy("http://localhost:8080").retries(3)
-                  .headers(Collections.singletonList(new ConnectionHeader("User-Agent", "Mozilla/5.0 (compatible"))).build();
-  Supplier<CrawlerRobotOptions> robotOptions =
-          () -> CrawlerRobotOptions.builder().ignoreRobotNoFollowTo(true).ignoreRobotRules(true)
-                  .ignoreRobotNoIndex(true).build();
-  Supplier<CrawlerConfig> crawlerConfig =
-          () -> CrawlerConfig.builder().actions(Collections.singletonList(crawlerAction.get()))
-                  .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
-                  .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
-                  .filterOptions(crawlerFilterOptions.get()).build();
-  Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
   @Autowired
   private JacksonTester<CrawlerResponse> json;
 
   @Test
-  void testSerialize()
-    throws Exception {
+  void whenSerialize_thenValidSerializedJson()
+          throws Exception {
     var crawler =
-            new CrawlerResponse(UUID.randomUUID(), "Test Crawler", CrawlerStatus.CREATED, crawlerConfig.get(),
+            new CrawlerResponse(UUID.randomUUID(), "Test Crawler", CrawlerStatus.CREATED, CrawlerTestDummyProvider.crawlerConfig.get(),
                     Instant.now(), Instant.now());
     var jsonContent = json.write(crawler);
     assertThat(jsonContent).extractingJsonPathStringValue("@.id").isEqualTo(crawler.id().toString());

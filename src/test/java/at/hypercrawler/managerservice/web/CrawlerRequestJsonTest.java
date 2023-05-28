@@ -16,17 +16,17 @@ class CrawlerRequestJsonTest {
   private JacksonTester<CrawlerRequest> json;
 
   @Test
-  void testDeserialize()
-    throws Exception {
+  void whenDeserialize_thenValidCrawlerObject()
+          throws Exception {
     var content = """
-                    {
-           "id":"ae683f02-7a5c-4a79-9c5c-ab93770c46f5",
-           "name":"Test Crawler",
-           "status":"CREATED",
-           "config":{
-              "indexPrefix":"crawler_",
-              "schedule":"0 0 0 1 1 ? 2099",
-              "startUrls":[
+                     {
+            "id":"ae683f02-7a5c-4a79-9c5c-ab93770c46f5",
+            "name":"Test Crawler",
+            "status":"CREATED",
+            "config":{
+               "indexPrefix":"crawler_",
+               "schedule":"0 0 0 1 1 ? 2099",
+               "startUrls":[
                  "https://www.google.com",
                  "https://www.bing.com"
               ],
