@@ -1,27 +1,25 @@
 package at.hypercrawler.managerservice.domain.service;
 
+import at.hypercrawler.managerservice.domain.CrawlerManagerRepository;
+import at.hypercrawler.managerservice.domain.exception.CrawlerAlreadyExistsException;
+import at.hypercrawler.managerservice.domain.exception.CrawlerNotFoundException;
+import at.hypercrawler.managerservice.domain.model.Crawler;
+import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
+import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
+import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
-
-import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import at.hypercrawler.managerservice.domain.CrawlerManagerRepository;
-import at.hypercrawler.managerservice.domain.exception.CrawlerAlreadyExistsException;
-import at.hypercrawler.managerservice.domain.exception.CrawlerNotFoundException;
-import at.hypercrawler.managerservice.domain.model.Crawler;
-import at.hypercrawler.managerservice.web.dto.CrawlerConfig;
-import at.hypercrawler.managerservice.web.dto.CrawlerStatus;
-import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -44,9 +42,9 @@ public class CrawlerManagerService {
     }
 
     public Mono<Crawler> createCrawler(Crawler crawler) {
-        return crawlerManagerRepository.existsById(crawler.getId()).flatMap(exists -> {
+        return crawlerManagerRepository.existsById(crawler.id()).flatMap(exists -> {
             if (Boolean.TRUE.equals(exists)) {
-                return Mono.error(new CrawlerAlreadyExistsException(crawler.getId()));
+                return Mono.error(new CrawlerAlreadyExistsException(crawler.id()));
             }
             return crawlerManagerRepository.save(crawler);
         });
@@ -66,8 +64,8 @@ public class CrawlerManagerService {
 
     public Mono<Crawler> updateCrawler(UUID uuid, String name, CrawlerConfig config) {
         UnaryOperator<Crawler> updateCrawler =
-                c -> new Crawler(c.getId(), name, config, c.getStatus(), c.getCreatedAt(), c.getUpdatedAt(),
-                        c.getVersion());
+                c -> new Crawler(c.id(), name, config, c.status(), c.createdAt(), c.updatedAt(),
+                        c.version());
         return crawlerManagerRepository.findById(uuid).map(updateCrawler)
                 .flatMap(crawlerManagerRepository::save)
                 .switchIfEmpty(Mono.error(new CrawlerNotFoundException(uuid)));
@@ -75,8 +73,8 @@ public class CrawlerManagerService {
 
     private Mono<Crawler> updateCrawlerStatus(UUID uuid, CrawlerStatus status) {
         UnaryOperator<Crawler> applyStatus =
-                c -> new Crawler(c.getId(), c.getName(), c.getConfig(), status, c.getCreatedAt(), c.getUpdatedAt(),
-                        c.getVersion());
+                c -> new Crawler(c.id(), c.name(), c.config(), status, c.createdAt(), c.updatedAt(),
+                        c.version());
 
         return crawlerManagerRepository.findById(uuid).map(applyStatus).flatMap(crawlerManagerRepository::save)
                 .switchIfEmpty(Mono.error(new CrawlerNotFoundException(uuid))).doOnNext(crawler -> {
@@ -87,7 +85,7 @@ public class CrawlerManagerService {
     }
 
     private void publishAddressSupplyEvent(Crawler crawler) {
-        UUID id = crawler.getId();
+        UUID id = crawler.id();
 
         identifyPublishAdresses(crawler).forEach(address -> {
             var addressSupplyMessage = new AddressSuppliedMessage(id, address);
@@ -101,7 +99,7 @@ public class CrawlerManagerService {
     private List<URL> identifyPublishAdresses(Crawler crawler) {
         List<URL> publishAdresses = new ArrayList<>();
 
-        for (String address : crawler.getConfig().getStartUrls()) {
+        for (String address : crawler.config().startUrls()) {
             try {
                 publishAdresses.add(new URL(address));
             } catch (MalformedURLException e) {

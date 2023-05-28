@@ -1,12 +1,11 @@
 package at.hypercrawler.managerservice.web.controller;
 
-import java.util.function.Function;
-
+import at.hypercrawler.managerservice.domain.model.Crawler;
+import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
+import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
 import org.springframework.stereotype.Component;
 
-import at.hypercrawler.managerservice.domain.model.Crawler;
-import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
-import at.hypercrawler.managerservice.web.dto.CrawlerStatus;
+import java.util.function.Function;
 
 @Component
 public class CrawlerRequestMapper
@@ -16,9 +15,9 @@ public class CrawlerRequestMapper
     public Crawler apply(CrawlerRequest crawlerRequest) {
         // @formatter:off
         return new Crawler(
-                crawlerRequest.getName(),
+                crawlerRequest.name(),
                 CrawlerStatus.CREATED,
-                crawlerRequest.getConfig()
+                crawlerRequest.config()
         );
         // @formatter:on
     }

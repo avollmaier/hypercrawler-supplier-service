@@ -1,18 +1,21 @@
 package at.hypercrawler.managerservice.web.dto;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
+import at.hypercrawler.managerservice.CrawlerTestDummyProvider;
+import at.hypercrawler.managerservice.domain.model.ConnectionHeader;
+import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
+import at.hypercrawler.managerservice.domain.model.CrawlerFilterOptions;
+import at.hypercrawler.managerservice.domain.model.CrawlerRequestOptions;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,29 +23,13 @@ class CrawlerConfigValiationTest {
 
   private static Validator validator;
 
-  Supplier<List<String>> startUrls = () -> Arrays.asList("https://www.google.com", "https://www.bing.com");
-  Supplier<List<SupportedFileType>> fileTypesToMatch =
-    () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF);
-  Supplier<List<String>> pathsToMatch = () -> List.of("http://www.foufos.gr/**");
-  Supplier<List<String>> selectorsToMatch = () -> Arrays.asList(".products", "!.featured");
-
-  Supplier<CrawlerAction> crawlerAction =
-    () -> CrawlerAction.builder().fileTypesToMatch(fileTypesToMatch.get()).pathsToMatch(pathsToMatch.get())
-      .selectorsToMatch(selectorsToMatch.get()).indexName("test_index").build();
-  Supplier<CrawlerRequestOptions> crawlerRequestOptions =
-    () -> CrawlerRequestOptions.builder().requestTimeout(1000).proxy("http://localhost:8080").retries(3)
-      .headers(Collections.singletonList(new Header("User-Agent", "Mozilla/5.0 (compatible"))).build();
-  Supplier<CrawlerRobotOptions> robotOptions =
-    () -> CrawlerRobotOptions.builder().ignoreRobotNoFollowTo(true).ignoreRobotRules(true)
-      .ignoreRobotNoIndex(true).build();
   Supplier<String> validCron = () -> "0 0 12 * * ?";
-  //supplier with prefilled builder
+
   Supplier<CrawlerConfig.CrawlerConfigBuilder> crawlerConfigBuilder =
-    () -> CrawlerConfig.builder().actions(Collections.singletonList(crawlerAction.get()))
-      .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
-      .schedule(validCron.get()).robotOptions(robotOptions.get())
-      .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"));
+    () -> CrawlerConfig.builder().actions(Collections.singletonList(CrawlerTestDummyProvider.crawlerAction.get()))
+      .indexPrefix("crawler_").requestOptions(CrawlerTestDummyProvider.crawlerRequestOptions.get()).startUrls(CrawlerTestDummyProvider.startUrls.get())
+      .schedule(validCron.get()).robotOptions(CrawlerTestDummyProvider.robotOptions.get())
+      .filterOptions(CrawlerTestDummyProvider.crawlerFilterOptions.get());
 
   @BeforeAll
   public static void setUp() {
@@ -114,8 +101,8 @@ class CrawlerConfigValiationTest {
   }
 
   @Test
-  void whenSiteExclusionPatternsIsNullThenValidationFails() {
-    var crawlerConfig = crawlerConfigBuilder.get().siteExclusionPatterns(null).build();
+  void whenSiteExclusionPatternsIsNullThenValidationSucceeds() {
+    var crawlerConfig = crawlerConfigBuilder.get().filterOptions(CrawlerFilterOptions.builder().siteExclusionPatterns(null).build()).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isEmpty();
@@ -124,7 +111,7 @@ class CrawlerConfigValiationTest {
   @Test
   void whenAddedSiteExclusionPatternIsNullThenValidationFails() {
     var siteExclusionPatterns = Arrays.asList("https://www.google.com", null);
-    var crawlerConfig = crawlerConfigBuilder.get().siteExclusionPatterns(siteExclusionPatterns).build();
+    var crawlerConfig = crawlerConfigBuilder.get().filterOptions(CrawlerFilterOptions.builder().siteExclusionPatterns(siteExclusionPatterns).build()).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
@@ -134,7 +121,7 @@ class CrawlerConfigValiationTest {
   @Test
   void whenAddedSiteExclusionPatternIsEmptyThenValidationFails() {
     var siteExclusionPatterns = Arrays.asList("https://www.google.com", "");
-    var crawlerConfig = crawlerConfigBuilder.get().siteExclusionPatterns(siteExclusionPatterns).build();
+    var crawlerConfig = crawlerConfigBuilder.get().filterOptions(CrawlerFilterOptions.builder().siteExclusionPatterns(siteExclusionPatterns).build()).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
@@ -143,7 +130,7 @@ class CrawlerConfigValiationTest {
 
   @Test
   void whenQueryParameterExclusionPatternsIsNullThenValidationSucceeds() {
-    var crawlerConfig = crawlerConfigBuilder.get().queryParameterExclusionPatterns(null).build();
+    var crawlerConfig = crawlerConfigBuilder.get().filterOptions(CrawlerFilterOptions.builder().queryParameterExclusionPatterns(null).build()).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isEmpty();
@@ -152,8 +139,7 @@ class CrawlerConfigValiationTest {
   @Test
   void whenAddedQueryParameterExclusionPatternIsNullThenValidationFails() {
     var queryParameterExclusionPatterns = Arrays.asList("utm_*", null);
-    var crawlerConfig =
-      crawlerConfigBuilder.get().queryParameterExclusionPatterns(queryParameterExclusionPatterns).build();
+    var crawlerConfig = crawlerConfigBuilder.get().filterOptions(CrawlerFilterOptions.builder().queryParameterExclusionPatterns(queryParameterExclusionPatterns).build()).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
@@ -163,8 +149,7 @@ class CrawlerConfigValiationTest {
   @Test
   void whenAddedQueryParameterExclusionPatternIsEmptyThenValidationFails() {
     var queryParameterExclusionPatterns = Arrays.asList("utm_*", "");
-    var crawlerConfig =
-      crawlerConfigBuilder.get().queryParameterExclusionPatterns(queryParameterExclusionPatterns).build();
+    var crawlerConfig = crawlerConfigBuilder.get().filterOptions(CrawlerFilterOptions.builder().queryParameterExclusionPatterns(queryParameterExclusionPatterns).build()).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty().hasSize(1).extracting(ConstraintViolation::getMessage)
@@ -210,7 +195,7 @@ class CrawlerConfigValiationTest {
 
   @Test
   void whenAddedRequestOptionHeaderIsNullThenValidationFails() {
-    var headers = Arrays.asList(new Header("name", "type"), null);
+    var headers = Arrays.asList(new ConnectionHeader("name", "type"), null);
     var requestOptions =
       CrawlerRequestOptions.builder().requestTimeout(12).retries(12).headers(headers).build();
     var crawlerConfig = crawlerConfigBuilder.get().requestOptions(requestOptions).build();
@@ -222,7 +207,7 @@ class CrawlerConfigValiationTest {
 
   @Test
   void whenAddedRequestOptionHeaderNameIsNullThenValidationFails() {
-    var headers = Arrays.asList(new Header(null, "type"));
+    var headers = Arrays.asList(new ConnectionHeader(null, "type"));
     var requestOptions =
       CrawlerRequestOptions.builder().requestTimeout(12).retries(12).headers(headers).build();
     var crawlerConfig = crawlerConfigBuilder.get().requestOptions(requestOptions).build();
@@ -235,7 +220,7 @@ class CrawlerConfigValiationTest {
 
   @Test
   void whenAddedRequestOptionHeaderTypeIsNullThenValidationFails() {
-    var headers = Arrays.asList(new Header("name", null));
+    var headers = Arrays.asList(new ConnectionHeader("name", null));
     var requestOptions =
       CrawlerRequestOptions.builder().requestTimeout(12).retries(12).headers(headers).build();
     var crawlerConfig = crawlerConfigBuilder.get().requestOptions(requestOptions).build();
@@ -265,7 +250,7 @@ class CrawlerConfigValiationTest {
 
   @Test
   void whenAddedActionIsNullThenValidationFails() {
-    var actions = Arrays.asList(crawlerAction.get(), null);
+    var actions = Arrays.asList(CrawlerTestDummyProvider.crawlerAction.get(), null);
     var crawlerConfig = crawlerConfigBuilder.get().actions(actions).build();
     var crawlerRequest = new CrawlerRequest("Test Crawler", crawlerConfig);
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);

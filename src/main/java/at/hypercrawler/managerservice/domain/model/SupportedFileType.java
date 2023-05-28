@@ -1,4 +1,4 @@
-package at.hypercrawler.managerservice.web.dto;
+package at.hypercrawler.managerservice.domain.model;
 
 public enum SupportedFileType {
     HTML("html"), PDF("pdf"), TXT("txt");

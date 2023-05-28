@@ -1,51 +1,39 @@
 package at.hypercrawler.managerservice.domain.model;
 
-import java.time.Instant;
-import java.util.UUID;
-
-import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import at.hypercrawler.managerservice.web.dto.CrawlerConfig;
-import at.hypercrawler.managerservice.web.dto.CrawlerStatus;
+import java.time.Instant;
+import java.util.UUID;
 
-@Data
-@NoArgsConstructor
 @Document(value = "crawler")
-public class Crawler {
-  @Id
-  UUID id;
+public record Crawler(
 
-  String name;
+        @Id
+        UUID id,
 
-  CrawlerConfig config;
+        String name,
 
-  CrawlerStatus status;
+        CrawlerConfig config,
 
-  @CreatedDate
-  Instant createdAt;
+        CrawlerStatus status,
 
-  @LastModifiedDate
-  Instant updatedAt;
+        @CreatedDate
+        Instant createdAt,
 
-  @Version
-  int version;
+        @LastModifiedDate
+        Instant updatedAt,
 
-  public Crawler(String name, CrawlerStatus status, CrawlerConfig config) {
-    this(UUID.randomUUID(), name, config, status, Instant.now(), Instant.now(), 0);
-  }
+        @Version
+        int version
 
-  public Crawler(UUID id, String name, CrawlerConfig config, CrawlerStatus status, Instant createdAt, Instant updatedAt, int version) {
-    this.id = id;
-    this.name = name;
-    this.config = config;
-    this.status = status;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-    this.version = version;
-  }
+) {
+
+    public Crawler(String name, CrawlerStatus status, CrawlerConfig config) {
+        this(UUID.randomUUID(), name, config, status, Instant.now(), Instant.now(), 0);
+    }
+
 }

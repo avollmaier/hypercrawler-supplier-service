@@ -1,48 +1,20 @@
 package at.hypercrawler.managerservice.web.dto;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
+import at.hypercrawler.managerservice.CrawlerTestDummyProvider;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerRequestValiationTest {
 
   private static Validator validator;
-
-  Supplier<List<String>> startUrls = () -> Arrays.asList("https://www.google.com", "https://www.bing.com");
-  Supplier<List<SupportedFileType>> fileTypesToMatch =
-    () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF);
-  Supplier<List<String>> pathsToMatch = () -> List.of("http://www.foufos.gr/**");
-  Supplier<List<String>> selectorsToMatch = () -> Arrays.asList(".products", "!.featured");
-
-  Supplier<CrawlerAction> crawlerAction =
-    () -> CrawlerAction.builder().fileTypesToMatch(fileTypesToMatch.get()).pathsToMatch(pathsToMatch.get())
-      .selectorsToMatch(selectorsToMatch.get()).indexName("test_index").build();
-  Supplier<CrawlerRequestOptions> crawlerRequestOptions =
-    () -> CrawlerRequestOptions.builder().requestTimeout(1000).proxy("http://localhost:8080").retries(3)
-      .headers(Collections.singletonList(new Header("User-Agent", "Mozilla/5.0 (compatible"))).build();
-  Supplier<CrawlerRobotOptions> robotOptions =
-    () -> CrawlerRobotOptions.builder().ignoreRobotNoFollowTo(true).ignoreRobotRules(true)
-      .ignoreRobotNoIndex(true).build();
-  Supplier<CrawlerConfig> crawlerConfig =
-    () -> CrawlerConfig.builder().actions(Collections.singletonList(crawlerAction.get()))
-      .indexPrefix("crawler_").requestOptions(crawlerRequestOptions.get()).startUrls(startUrls.get())
-      .schedule("0 0 0 1 1 ? 2099").robotOptions(robotOptions.get())
-      .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-      .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
-            .build();
-  Supplier<CrawlerRequest> crawlerRequest = () -> new CrawlerRequest("Test Crawler", crawlerConfig.get());
 
   @BeforeAll
   public static void setUp() {
@@ -52,20 +24,20 @@ public class CrawlerRequestValiationTest {
 
   @Test
   void whenAllFieldsCorrectThenValidationSucceeds() {
-    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest.get());
+    Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(CrawlerTestDummyProvider.crawlerRequest.get());
     assertThat(violations).isEmpty();
   }
 
   @Test
   void whenNameIsNullThenValidationFails() {
-    var crawlerRequest = new CrawlerRequest(null, crawlerConfig.get());
+    var crawlerRequest = new CrawlerRequest(null, CrawlerTestDummyProvider.crawlerConfig.get());
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty();
   }
 
   @Test
   void whenNameIsEmptyThenValidationFails() {
-    var crawlerRequest = new CrawlerRequest("", crawlerConfig.get());
+    var crawlerRequest = new CrawlerRequest("", CrawlerTestDummyProvider.crawlerConfig.get());
     Set<ConstraintViolation<CrawlerRequest>> violations = validator.validate(crawlerRequest);
     assertThat(violations).isNotEmpty();
   }
