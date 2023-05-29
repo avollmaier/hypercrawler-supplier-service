@@ -46,8 +46,11 @@ class CrawlerResponseJsonTest {
     assertThat(jsonContent).extractingJsonPathStringValue("@.config.filterOptions.queryParameterExclusionPatterns[0]")
             .isEqualTo(crawler.config().filterOptions().queryParameterExclusionPatterns().get(0));
 
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.requestOptions.proxy")
-            .isEqualTo(crawler.config().requestOptions().proxy());
+    assertThat(jsonContent).extractingJsonPathStringValue("@.config.requestOptions.proxy.host")
+            .isEqualTo(crawler.config().requestOptions().proxy().host());
+    assertThat(jsonContent).extractingJsonPathNumberValue("@.config.requestOptions.proxy.port")
+            .isEqualTo(crawler.config().requestOptions().proxy().port());
+
     assertThat(jsonContent).extractingJsonPathNumberValue("@.config.requestOptions.requestTimeout")
             .isEqualTo(crawler.config().requestOptions().requestTimeout());
     assertThat(jsonContent).extractingJsonPathNumberValue("@.config.requestOptions.retries")

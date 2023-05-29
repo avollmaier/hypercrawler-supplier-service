@@ -9,15 +9,15 @@ import java.util.List;
 @Builder
 public record CrawlerAction(
 
-        @NotBlank(message = "Index name could not be empty")
+        @NotBlank(message = "Index name could not be blank")
         String indexName,
 
-        @NotNull(message = "Paths to match during crawl could not be empty")
-        List<@NotNull(message = "Paths to match during crawl could not be empty") String> pathsToMatch,
+        @NotNull(message = "Paths to match during crawl could not be null")
+        List<@NotNull(message = "Path to match could not be null") String> pathsToMatch,
 
-        List<@NotBlank(message = "Selectors to match during crawl could not be empty") String> selectorsToMatch,
+        List<@NotBlank(message = "Selectors to match during crawl could not be blank") String> selectorsToMatch,
 
-        List<@NotNull(message = "File type to match during crawl could not be empty") SupportedFileType> fileTypesToMatch
+        List<@NotNull(message = "File type to match during crawl could not be null") SupportedFileType> fileTypesToMatch
 
 ) {
 

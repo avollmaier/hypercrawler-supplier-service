@@ -1,5 +1,6 @@
 package at.hypercrawler.managerservice;
 
+import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
 import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
 import at.hypercrawler.managerservice.web.dto.CrawlerResponse;
 import at.hypercrawler.managerservice.web.dto.StatusResponse;
@@ -21,6 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,17 +101,30 @@ class CrawlerServiceApplicationTest {
     }
 
     @Test
+    void whenGetCrawlerConfigRequest_thenCrawlerConfigIsReturned() throws JsonProcessingException {
+        var crawlerResponse = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.crawlerRequest.get())).exchange().expectStatus()
+                .isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
+        assertNotNull(crawlerResponse);
+
+        webTestClient.get().uri("/crawlers/" + crawlerResponse.id() + "/config").exchange().expectStatus().isOk()
+                .expectBody(CrawlerConfig.class).value(actualCrawlerResponse -> {
+                    assertThat(crawlerResponse.config()).isEqualTo(actualCrawlerResponse);
+                });
+    }
+
+    @Test
     void whenGetCrawlerRequestWithInvalidId_thenNotFound() {
         webTestClient.get().uri("/crawlers/" + UUID.randomUUID()).exchange().expectStatus().isNotFound();
     }
 
     @Test
     void whenDeleteCrawlerRequest_thenCrawlerIsDeleted() throws JsonProcessingException {
-      var crawlerResponse = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
-              .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.crawlerRequest.get())).exchange().expectStatus()
-        .isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
+        var crawlerResponse = webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.crawlerRequest.get())).exchange().expectStatus()
+                .isCreated().expectBody(CrawlerResponse.class).returnResult().getResponseBody();
 
-      assertNotNull(crawlerResponse);
+        assertNotNull(crawlerResponse);
 
         webTestClient.delete().uri("/crawlers/" + crawlerResponse.id()).exchange().expectStatus()
                 .isNoContent();
@@ -127,8 +142,8 @@ class CrawlerServiceApplicationTest {
         webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.crawlerRequest.get())).exchange().expectStatus()
                 .isCreated().expectBody(CrawlerResponse.class).returnResult();
-        var crawlerResponse = webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
-                .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody().get(0);
+        var crawlerResponse = Objects.requireNonNull(webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
+                .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody()).get(0);
 
         webTestClient.put().uri("/crawlers/" + crawlerResponse.id()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.updatedCrawlerRequest.get())).exchange().expectStatus()
@@ -147,13 +162,13 @@ class CrawlerServiceApplicationTest {
     void whenRunCrawlerRequest_thenCrawlerIsStarted() throws IOException {
         webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.crawlerRequest.get())).exchange().expectStatus()
-        .isCreated().expectBody(CrawlerResponse.class).returnResult();
+                .isCreated().expectBody(CrawlerResponse.class).returnResult();
 
-      var crawlerResponse = webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
-        .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody().get(0);
+        var crawlerResponse = Objects.requireNonNull(webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
+                .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody()).get(0);
 
         webTestClient.put().uri("/crawlers/" + crawlerResponse.id() + "/run").exchange().expectStatus()
-        .isOk().expectBody(CrawlerResponse.class).value(c -> {
+                .isOk().expectBody(CrawlerResponse.class).value(c -> {
                     assertThat(c.id()).isEqualTo(crawlerResponse.id());
                     assertThat(c.name()).isEqualTo(crawlerResponse.name());
                     assertThat(c.status()).isEqualTo(CrawlerStatus.STARTED);
@@ -167,13 +182,13 @@ class CrawlerServiceApplicationTest {
     void whenStopCrawlerRequest_thenCrawlerIsStopped() throws IOException {
         webTestClient.post().uri("/crawlers").contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(CrawlerTestDummyProvider.crawlerRequest.get())).exchange().expectStatus()
-        .isCreated().expectBody(CrawlerResponse.class).returnResult();
+                .isCreated().expectBody(CrawlerResponse.class).returnResult();
 
-      var crawlerResponse = webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
-        .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody().get(0);
+        var crawlerResponse = Objects.requireNonNull(webTestClient.get().uri("/crawlers").exchange().expectStatus().isOk()
+                .expectBodyList(CrawlerResponse.class).returnResult().getResponseBody()).get(0);
 
         webTestClient.put().uri("/crawlers/" + crawlerResponse.id() + "/pause").exchange().expectStatus()
-        .isOk().expectBody(CrawlerResponse.class).value(c -> {
+                .isOk().expectBody(CrawlerResponse.class).value(c -> {
                     assertThat(c.id()).isEqualTo(crawlerResponse.id());
                     assertThat(c.name()).isEqualTo(crawlerResponse.name());
                     assertThat(c.status()).isEqualTo(CrawlerStatus.STOPPED);

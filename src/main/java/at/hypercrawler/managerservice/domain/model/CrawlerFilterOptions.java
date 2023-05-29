@@ -8,9 +8,9 @@ import java.util.List;
 @Builder
 public record CrawlerFilterOptions(
 
-        List<@NotBlank(message = "Exclusion-Pattern could not be empty") String> siteExclusionPatterns,
+        List<@NotBlank(message = "Exclusion-Pattern could not be blank") String> siteExclusionPatterns,
 
-        List<@NotBlank(message = "Ignored-Query-Parameter could not be empty") String> queryParameterExclusionPatterns
+        List<@NotBlank(message = "Ignored-Query-Parameter could not be blank") String> queryParameterExclusionPatterns
 
 ) {
 }

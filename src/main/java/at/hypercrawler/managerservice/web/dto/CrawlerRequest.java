@@ -9,10 +9,10 @@ import lombok.Builder;
 @Builder
 public record CrawlerRequest(
 
-        @NotBlank(message = "Name must not be blank")
+        @NotBlank(message = "Name could not be blank")
         String name,
 
-        @NotNull
+        @NotNull(message = "Config could not be null")
         @Valid
         CrawlerConfig config
 

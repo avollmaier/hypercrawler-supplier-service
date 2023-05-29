@@ -45,16 +45,20 @@ public class CrawlerTestDummyProvider {
                     .indexName("test2_index")
                     .build();
 
+
+    public static Supplier<ConnectionProxy> connectionProxy =
+            () -> new ConnectionProxy("localhost", 8080);
+
     public static Supplier<CrawlerRequestOptions> crawlerRequestOptions =
             () -> CrawlerRequestOptions.builder()
                     .requestTimeout(1000)
-                    .proxy("http://localhost:8080")
+                    .proxy(connectionProxy.get())
                     .retries(3)
                     .headers(Collections.singletonList(new ConnectionHeader("User-Agent", "Mozilla/5.0 (compatible")))
                     .build();
     public static Supplier<CrawlerRequestOptions> updatedCrawlerRequestOptions =
             () -> CrawlerRequestOptions.builder().requestTimeout(11000)
-                    .proxy("http://localhost:8090")
+                    .proxy(connectionProxy.get())
                     .retries(32)
                     .headers(Collections.singletonList(new ConnectionHeader("User-Agent", "Chrome/5.0 (compatible")))
                     .build();

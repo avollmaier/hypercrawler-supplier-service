@@ -1,4 +1,4 @@
-package at.hypercrawler.managerservice.domain.config;
+package at.hypercrawler.managerservice.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.EnableReactiveMongoAuditing;

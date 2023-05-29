@@ -10,13 +10,16 @@ import java.util.List;
 @Builder
 public record CrawlerRequestOptions(
 
-        String proxy,
+        @Valid
+        ConnectionProxy proxy,
 
         @Min(value = 1, message = "Request timeout must be greater than 0")
-        int requestTimeout,
+        @NotNull(message = "Request timeout could not be null")
+        Integer requestTimeout,
 
         @Min(value = 1, message = "Retries must be greater than 0")
-        int retries,
+        @NotNull(message = "Request retries could not be null")
+        Integer retries,
 
         List<@Valid @NotNull(message = "Request header could not be null") ConnectionHeader> headers
 ) {

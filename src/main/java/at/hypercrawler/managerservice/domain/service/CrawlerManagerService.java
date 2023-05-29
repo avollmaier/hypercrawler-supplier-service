@@ -87,14 +87,14 @@ public class CrawlerManagerService {
     }
 
     private void publishAddressSupplyEvent(Crawler crawler) {
-        UUID id = crawler.id();
+        UUID crawlerId = crawler.id();
 
         identifyPublishAdresses(crawler).forEach(address -> {
-            var addressSupplyMessage = new AddressSuppliedMessage(id, address);
-            log.info("Sending data with address {} of crawler with id: {}", address, id);
+            var addressSupplyMessage = new AddressSuppliedMessage(crawlerId, address);
+            log.info("Sending data with address {} of crawler with id: {}", address, crawlerId);
 
             var result = streamBridge.send(SUPPLY_ADDRESS_OUT, addressSupplyMessage);
-            log.info("Result of sending address {} for crawler with id: {} is {}", address, id, result);
+            log.info("Result of sending address {} for crawler with id: {} is {}", address, crawlerId, result);
         });
     }
 
