@@ -21,7 +21,7 @@ repositories {
 
 ext {
     set('springCloudVersion', "2022.0.2")
-    set('testcontainersVersion', "1.18.0")
+    set('testcontainersVersion', "1.18.3")
 }
 
 dependencies {
