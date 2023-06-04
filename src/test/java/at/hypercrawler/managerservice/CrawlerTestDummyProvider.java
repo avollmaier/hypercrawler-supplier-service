@@ -1,12 +1,21 @@
 package at.hypercrawler.managerservice;
 
-import at.hypercrawler.managerservice.domain.model.*;
-import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+
+import at.hypercrawler.managerservice.domain.model.ConnectionHeader;
+import at.hypercrawler.managerservice.domain.model.ConnectionProxy;
+import at.hypercrawler.managerservice.domain.model.Crawler;
+import at.hypercrawler.managerservice.domain.model.CrawlerAction;
+import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
+import at.hypercrawler.managerservice.domain.model.CrawlerFilterOptions;
+import at.hypercrawler.managerservice.domain.model.CrawlerRequestOptions;
+import at.hypercrawler.managerservice.domain.model.CrawlerRobotOptions;
+import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
+import at.hypercrawler.managerservice.domain.model.SupportedContentMediaType;
+import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
 
 public class CrawlerTestDummyProvider {
 
@@ -77,13 +86,13 @@ public class CrawlerTestDummyProvider {
 
     public static Supplier<CrawlerFilterOptions> crawlerFilterOptions =
             () -> CrawlerFilterOptions.builder()
-                    .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
-                    .siteExclusionPatterns(Collections.singletonList("https://www.google.com/**"))
+              .queryParameterExclusionPatterns(Collections.singletonList("utm_*"))
+              .siteExclusionPatterns(Collections.singletonList("https://www.google.com/*"))
                     .build();
     public static Supplier<CrawlerFilterOptions> updatedCrawlerFilterOptions =
             () -> CrawlerFilterOptions.builder()
-                    .queryParameterExclusionPatterns(Collections.singletonList("utc_*"))
-                    .siteExclusionPatterns(Collections.singletonList("https://www.yahoo.com/**"))
+              .queryParameterExclusionPatterns(Collections.singletonList("utc_*"))
+              .siteExclusionPatterns(Collections.singletonList("https://www.yahoo.com/*"))
                     .build();
 
     public static Supplier<CrawlerConfig> crawlerConfig =

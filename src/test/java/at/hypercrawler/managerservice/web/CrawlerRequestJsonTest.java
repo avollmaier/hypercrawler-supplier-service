@@ -1,13 +1,14 @@
 package at.hypercrawler.managerservice.web;
 
-import at.hypercrawler.managerservice.CrawlerTestDummyProvider;
-import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import at.hypercrawler.managerservice.CrawlerTestDummyProvider;
+import at.hypercrawler.managerservice.web.dto.CrawlerRequest;
 
 @JsonTest
 class CrawlerRequestJsonTest {
@@ -22,27 +23,27 @@ class CrawlerRequestJsonTest {
             {
                         "id":"ae683f02-7a5c-4a79-9c5c-ab93770c46f5",
                         "name":"Test Crawler",
-                        "status":"CREATED",
-                        "config":{
-                           "indexPrefix":"crawler_",
-                           "schedule":"0 0 0 1 1 ? 2099",
-                           "startUrls":[
-                              "https://www.google.com",
-                              "https://www.bing.com"
-                           ],
-                           "filterOptions":{
-                              "siteExclusionPatterns":[
-                                 "https://www.google.com/**"
-                              ],
-                              "queryParameterExclusionPatterns":[
-                                 "utm_*"
-                              ]
-                           },
-                           "requestOptions":{
-                              "proxy": {
-                                "host": "localhost",
-                                "port": 8080
-                              },
+                              "status":"CREATED",
+                              "config":{
+                                 "indexPrefix":"crawler_",
+                                 "schedule":"0 0 0 1 1 ? 2099",
+                                 "startUrls":[
+                                    "https://www.google.com",
+                                    "https://www.bing.com"
+                                 ],
+                                 "filterOptions":{
+                                    "siteExclusionPatterns":[
+                                       "https://www.google.com/*"
+                                    ],
+                                    "queryParameterExclusionPatterns":[
+                                       "utm_*"
+                                    ]
+                                 },
+                                 "requestOptions":{
+                                    "proxy": {
+                                      "host": "localhost",
+                                      "port": 8080
+                                    },
                               "requestTimeout":1000,
                               "retries":3,
                               "headers":[
