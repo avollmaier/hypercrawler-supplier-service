@@ -15,15 +15,15 @@ public class CrawlerTestDummyProvider {
     public static Supplier<List<String>> updatedStartUrls =
             () -> Arrays.asList("https://www.google.com", "https://www.bing.com", "https://www.yahoo.com");
 
-    public static Supplier<List<SupportedFileType>> fileTypesToMatch =
-            () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF);
-    public static Supplier<List<SupportedFileType>> updatedFileTypesToMatch =
-            () -> Arrays.asList(SupportedFileType.HTML, SupportedFileType.PDF, SupportedFileType.TXT);
+    public static Supplier<List<SupportedContentMediaType>> contentTypesToMatch =
+            () -> Arrays.asList(SupportedContentMediaType.HTML, SupportedContentMediaType.PDF);
+    public static Supplier<List<SupportedContentMediaType>> updatedContentTypesToMatch =
+            () -> Arrays.asList(SupportedContentMediaType.HTML, SupportedContentMediaType.PDF, SupportedContentMediaType.TXT);
 
     public static Supplier<List<String>> pathsToMatch =
-            () -> List.of("http://www.foufos.gr/**");
+            () -> List.of("http://www.foufos.gr/*");
     public static Supplier<List<String>> updatedPathsToMatch =
-            () -> List.of("http://www.foufos.gr/**", "http://www.foufos.gr/**");
+            () -> List.of("http://www.foufos.gr/*", "http://www.foufos.gr/*");
 
     public static Supplier<List<String>> selectorsToMatch =
             () -> Arrays.asList(".products", "!.featured");
@@ -32,14 +32,14 @@ public class CrawlerTestDummyProvider {
 
     public static Supplier<CrawlerAction> crawlerAction =
             () -> CrawlerAction.builder()
-                    .fileTypesToMatch(fileTypesToMatch.get())
+                    .contentTypesToMatch(contentTypesToMatch.get())
                     .pathsToMatch(pathsToMatch.get())
                     .selectorsToMatch(selectorsToMatch.get())
                     .indexName("test_index")
                     .build();
     public static Supplier<CrawlerAction> updatedCrawlerAction =
             () -> CrawlerAction.builder()
-                    .fileTypesToMatch(updatedFileTypesToMatch.get())
+                    .contentTypesToMatch(updatedContentTypesToMatch.get())
                     .pathsToMatch(updatedPathsToMatch.get())
                     .selectorsToMatch(updatedSelectorsToMatch.get())
                     .indexName("test2_index")

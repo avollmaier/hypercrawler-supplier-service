@@ -60,25 +60,25 @@ class CrawlerResponseJsonTest {
     assertThat(jsonContent).extractingJsonPathStringValue("@.config.requestOptions.headers[0].value")
             .isEqualTo(crawler.config().requestOptions().headers().get(0).value());
 
-    assertThat(jsonContent).extractingJsonPathBooleanValue("@.config.robotOptions.ignoreRobotNoFollowTo")
-            .isEqualTo(crawler.config().robotOptions().ignoreRobotNoFollowTo());
-    assertThat(jsonContent).extractingJsonPathBooleanValue("@.config.robotOptions.ignoreRobotRules")
-            .isEqualTo(crawler.config().robotOptions().ignoreRobotRules());
-    assertThat(jsonContent).extractingJsonPathBooleanValue("@.config.robotOptions.ignoreRobotNoIndex")
-            .isEqualTo(crawler.config().robotOptions().ignoreRobotNoIndex());
+      assertThat(jsonContent).extractingJsonPathBooleanValue("@.config.robotOptions.ignoreRobotNoFollowTo")
+              .isEqualTo(crawler.config().robotOptions().ignoreRobotNoFollowTo());
+      assertThat(jsonContent).extractingJsonPathBooleanValue("@.config.robotOptions.ignoreRobotRules")
+              .isEqualTo(crawler.config().robotOptions().ignoreRobotRules());
+      assertThat(jsonContent).extractingJsonPathBooleanValue("@.config.robotOptions.ignoreRobotNoIndex")
+              .isEqualTo(crawler.config().robotOptions().ignoreRobotNoIndex());
 
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].indexName")
-            .isEqualTo(crawler.config().actions().get(0).indexName());
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].fileTypesToMatch[0]")
-            .isEqualTo(crawler.config().actions().get(0).fileTypesToMatch().get(0).toString());
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].fileTypesToMatch[1]")
-            .isEqualTo(crawler.config().actions().get(0).fileTypesToMatch().get(1).toString());
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].pathsToMatch[0]")
-            .isEqualTo(crawler.config().actions().get(0).pathsToMatch().get(0));
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].selectorsToMatch[0]")
-            .isEqualTo(crawler.config().actions().get(0).selectorsToMatch().get(0));
-    assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].selectorsToMatch[1]")
-            .isEqualTo(crawler.config().actions().get(0).selectorsToMatch().get(1));
+      assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].indexName")
+              .isEqualTo(crawler.config().actions().get(0).indexName());
+      assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].contentTypesToMatch[0]")
+              .isEqualTo(crawler.config().actions().get(0).contentTypesToMatch().get(0).toString());
+      assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].contentTypesToMatch[1]")
+              .isEqualTo(crawler.config().actions().get(0).contentTypesToMatch().get(1).toString());
+      assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].pathsToMatch[0]")
+              .isEqualTo(crawler.config().actions().get(0).pathsToMatch().get(0));
+      assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].selectorsToMatch[0]")
+              .isEqualTo(crawler.config().actions().get(0).selectorsToMatch().get(0));
+      assertThat(jsonContent).extractingJsonPathStringValue("@.config.actions[0].selectorsToMatch[1]")
+              .isEqualTo(crawler.config().actions().get(0).selectorsToMatch().get(1));
   }
 
 }

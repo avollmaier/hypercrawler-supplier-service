@@ -61,13 +61,13 @@ class CrawlerRequestJsonTest {
                               {
                                  "indexName":"test_index",
                                  "pathsToMatch":[
-                                    "http://www.foufos.gr/**"
+                                    "http://www.foufos.gr/*"
                                  ],
                                  "selectorsToMatch":[
                                     ".products",
                                     "!.featured"
                                  ],
-                                 "fileTypesToMatch":[
+                                 "contentTypesToMatch":[
                                     "HTML",
                                     "PDF"
                                  ]

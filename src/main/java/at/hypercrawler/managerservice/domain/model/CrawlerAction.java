@@ -17,7 +17,7 @@ public record CrawlerAction(
 
         List<@NotBlank(message = "Selectors to match during crawl could not be blank") String> selectorsToMatch,
 
-        List<@NotNull(message = "File type to match during crawl could not be null") SupportedFileType> fileTypesToMatch
+        List<@NotNull(message = "Content type to match during crawl could not be null") SupportedContentMediaType> contentTypesToMatch
 
 ) {
 

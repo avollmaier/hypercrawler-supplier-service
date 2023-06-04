@@ -37,7 +37,6 @@ class CrawlerManagerRepositoryTest {
 
     @Test
     void whenCreateCrawler_thenCrawlerIsInDatabase() {
-
         StepVerifier.create(crawlerManagerRepository.save(CrawlerTestDummyProvider.crawler.get())).expectNextMatches(
                 c -> c.status().equals(CrawlerStatus.CREATED) && c.name().equals("Test Crawler")
                         && c.config().equals(CrawlerTestDummyProvider.crawlerConfig.get())).verifyComplete();
