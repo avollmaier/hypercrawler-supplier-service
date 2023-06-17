@@ -20,6 +20,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +62,7 @@ class CrawlerManagerMessageTest {
 
 
         assertThat(objectMapper.readValue(output.receive().getPayload(), AddressSuppliedMessage.class))
-                .isEqualTo(new AddressSuppliedMessage(crawlerResponse.id(), new URL(crawlerResponse.config().startUrls().get(0))));
+                .isEqualTo(new AddressSuppliedMessage(crawlerResponse.id(), List.of(new URL(crawlerResponse.config().startUrls().get(0)), new URL(crawlerResponse.config().startUrls().get(1)))));
     }
 
 }
