@@ -1,4 +1,4 @@
-package at.hypercrawler.managerservice.domain;
+package at.hypercrawler.managerservice.domain.repository;
 
 import at.hypercrawler.managerservice.domain.model.Crawler;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;

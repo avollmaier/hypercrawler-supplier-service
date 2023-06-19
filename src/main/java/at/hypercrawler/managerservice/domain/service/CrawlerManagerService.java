@@ -1,11 +1,11 @@
 package at.hypercrawler.managerservice.domain.service;
 
-import at.hypercrawler.managerservice.domain.CrawlerManagerRepository;
 import at.hypercrawler.managerservice.domain.exception.CrawlerAlreadyExistsException;
 import at.hypercrawler.managerservice.domain.exception.CrawlerNotFoundException;
 import at.hypercrawler.managerservice.domain.model.Crawler;
 import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
 import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
+import at.hypercrawler.managerservice.domain.repository.CrawlerManagerRepository;
 import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;

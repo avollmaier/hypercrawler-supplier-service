@@ -2,6 +2,7 @@ package at.hypercrawler.managerservice.domain;
 
 import at.hypercrawler.managerservice.CrawlerTestDummyProvider;
 import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
+import at.hypercrawler.managerservice.domain.repository.CrawlerManagerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
