@@ -7,19 +7,18 @@ import at.hypercrawler.managerservice.domain.model.CrawlerConfig;
 import at.hypercrawler.managerservice.domain.model.CrawlerStatus;
 import at.hypercrawler.managerservice.domain.repository.CrawlerManagerRepository;
 import at.hypercrawler.managerservice.event.AddressSuppliedMessage;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -51,6 +50,7 @@ public class CrawlerManagerService {
             return crawlerManagerRepository.save(crawler);
         });
     }
+
 
     public Mono<Crawler> startCrawler(UUID uuid) {
         return updateCrawlerStatus(uuid, CrawlerStatus.STARTED);
