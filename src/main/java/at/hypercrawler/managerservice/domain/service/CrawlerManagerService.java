@@ -22,7 +22,6 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
-@Transactional
 public class CrawlerManagerService {
     public static final String SUPPLY_ADDRESS_OUT = "supplyAddress-out-0";
 
